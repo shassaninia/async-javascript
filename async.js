@@ -1,92 +1,77 @@
 window.onload = function () {
 
-    /*  var http = new XMLHttpRequest();
-
-      http.onreadystatechange = function(){
-          if(http.readyState == 4 && http.status == 200)
-          {
-              //console.log(JSON.parse(http.response));
-          }
-      }
-      http.open("GET","data/tweets.json", true);
-      http.send();
-
-     //jquery method
-     $.get("data/tweets.json",function(data){
-      console.log(data);
-     }) */
-
-
-    /* var fruits = ['banana','apple','pear'];
-
-     //the function inside foreach is a callback function
-     //This function will be called for each fruit inside the fruits array
-     //val will hold the value of each fruit
-     //This callback function is inline
-     //It can be declared outside like function callback(){}
-     //This is a synchronous callback, "test" will be printed after all the fruits
-     fruits.forEach(function(val){
-          console.log(val);
-     });
-     console.log("test");
-     */
-
-    /*
-      //async example
-      //This is an async callback
-      //The request is sent outside of javascript and
-      //when it is returned, the callback is executed on the data.
-      //Since this is async, "test" might be printed before the callback executes.
-      $.get("data/tweets.json",function(data){
-        console.log(data);
-      });
-      console.log("test");
-
-      */
-
-    //what callback hell looks like
-    //Get tweets.
-    //Once we have tweets, get friends.
-    //Once we have tweets and friends, get videos
-    //This results in a triangle of death because of the shape
-    //This is very hard to work with
-    //Refactor this by moving out the error handler into a separate function
-    //and breaking the success callbacks into separate functions.
-
-
-
-    function handleError(jqXHR, textStatus, error) {
-        console.log(error);
-    }
-
-    function cbTweets(data) {
-        console.log(data);
-        
-        $.ajax({
-            type: "GET",
-            url: "data/friends.json",
-            success: cbFriends,
-            error: handleError
+    /* Promises */
+    //What is a promise? A promise is an object that represents an 
+    //action that hasn't finished yet, but will do at some point.
+    //It is a placeholder for some asynchronous operation
+    //As soon as an asynchronous operation has started, the Promise
+    //is returnd right away before the data is returned.
+    //We can register callbacks in the promise to handle what happens
+    //when the data comes back.  Promise is a new feature in ECMA Script 6
+    //and isn't supported in all browsers, however, there are libraries such as
+    //q that give more support.
+    //The native promise library is not supported in many browsers
+    //If you want full production support, probably stick to something like
+    //q for now.
+  /*  function get(url) {
+        //resolve is what happens when promise is success
+        //reject is what happens when promise is an error
+        return new Promise(function (resolve, reject) {
+            var xhttp = new XMLHttpRequest();
+            //Open connection
+            xhttp.open("GET", url, true);
+            //If browser supports browser, onload will be supported as
+            //well as onerror. No need to worry about onreadystatechanged
+            xhttp.onload = function () {
+                if (xhttp.status == 200) { //OK
+                    //resolve
+                    resolve(JSON.parse(xhttp.response))
+                } else {
+                    //reject
+                    reject(xhttp.statusText);
+                }
+            };
+            xhttp.onerror = function () {
+                reject(xhttp.statusText);
+            };
+            xhttp.send();
         });
     }
 
-    function cbFriends(data) {
-        console.log(data);
+    //When get is called, the promise is return to use right away
+    //before the data is returned.
+    var promise = get("data/tweets.json");
 
-        $.ajax({
-            type: "GET",
-            url: "data/videos.json",
-            success: function (data) {
-                console.log(data);
-            },
-            error: handleError
-        });
-    }
+    //We can register a callback with this promise to handle the data
+    //by using then.
+    //This basically says once I have the data, then I want to do this, 
+    //in this case console.log the tweets
+    //Chain the catch to the promise to handle errors
+    //We can chain multiple requests together by returning another promise
+    //Once we the data for tweets is returned, console it
+    //Then once the data for friends is returned, console it
+    //Then once the data for videos is returned, console it
+    //
+    promise.then(function (tweets) {
+        console.log(tweets);
+        return get("data/friends.json").then(function (friends) {
+            console.log(friends);
+            return get("data/videos.json").then(function (videos) {
+                console.log(videos);
+            })
+        })
+    }).catch(function (error) {
+        console.log(error)
+    }); */
 
-    $.ajax({
-        type: "GET",
-        url: "data/tweets.json",
-        success: cbTweets,
-        error: handleError
-    });
+    //Promises in jquery
+    $.get("data/tweets.json").then(function(tweets){
+        console.log(tweets);
+         return  $.get("data/friends.json");
+    }).then(function(friends){
+        console.log(friends);
+        return $.get("data/videos.json");
+    }).then(function(videos){
+        console.log(videos);
+    })
 };
